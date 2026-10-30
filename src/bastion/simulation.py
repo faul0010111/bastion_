@@ -180,7 +180,10 @@ def run_simulation(
             for n in names[N_MODIFY + N_RENAME:N_MODIFY + N_RENAME + N_DELETE]:
                 box.delete(n)
             box.append_text(CANARY_NAME, "\n(simulation: canary touched)")
-            monitor.wait_idle(1.5, timeout=20)
+            # Native observers can deliver a batch after the writes finish.
+            # Let the OS notification queue catch up before requiring a full quiet window.
+            time.sleep(1.0)
+            monitor.wait_idle(2.0, timeout=20)
         finally:
             monitor.stop()
         report.alerts = list(monitor.alerts)
