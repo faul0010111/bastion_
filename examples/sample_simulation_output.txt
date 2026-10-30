@@ -1,0 +1,118 @@
+== Bastion safe simulation ==
+Everything happens on FICTIONAL files inside a temporary folder; no real data is touched.
+
+Simulation folder (fictional files): /home/you/project/.bastion_sim/run-hwchoe30/data
+74 fictional files + canaries created. Starting the monitor...
+
+Phase 1: normal activity (3 small edits). Should not raise alerts.
+
+Phase 2: FICTIONAL burst on simulation files (30 overwritten with random bytes, 8 PDFs losing their header, 15 renamed, 12 deleted, a notice dropped in 6 folders, 1 canary touched).
+
+[HIGH] Files started to look like random data  (rule: entropy_spike)
+  What was observed: 8 distinct files had a sharp jump in content entropy within 15 s (rule threshold: 8). Encrypted or compressed content has entropy close to 8 bits/byte.
+  Could be legitimate if it is: bulk compression, exports to compressed formats, or encryption you performed on purpose.
+  What to do: If you did not start any compression or encryption, disconnect the machine from the network and contact whoever handles security before deleting or rebooting anything.
+  Related events (showing 3 of 8):
+    2026-10-24 21:17:02  modified  doc_000.txt  [sha256=8570e6cd23d7…, entropy=7.96 (was 4.02)]
+    2026-10-24 21:17:02  modified  doc_001.txt  [sha256=a529331b315f…, entropy=7.95 (was 4.02)]
+    2026-10-24 21:17:02  modified  doc_002.txt  [sha256=22ea9f3c9ceb…, entropy=7.95 (was 4.03)]
+  ⚠ This is a signal for analysis: it may have a legitimate cause and, on its own, does not prove malicious activity.
+
+
+[MEDIUM] Many files modified in a short time  (rule: mass_modification)
+  What was observed: 15 distinct files were modified within 10 s (rule threshold: 15).
+  Could be legitimate if it is: software updates, reindexing, builds, cloud sync or a backup restore.
+  What to do: Identify which program or user is writing these files and run 'bastion verify' to compare against the inventory.
+  Related events (showing 3 of 15):
+    2026-10-24 21:17:01  modified  doc_057.txt  [sha256=4f2965243c92…, entropy=4.03 (was 4.03)]
+    2026-10-24 21:17:01  modified  doc_058.txt  [sha256=67d70238bf1d…, entropy=4.03 (was 4.02)]
+    2026-10-24 21:17:01  modified  doc_059.txt  [sha256=9b03980b6160…, entropy=4.03 (was 4.03)]
+  ⚠ This is a signal for analysis: it may have a legitimate cause and, on its own, does not prove malicious activity.
+
+
+[HIGH] Files lost their recognizable format header  (rule: header_lost)
+  What was observed: 6 distinct files that used to start with a known format header (PDF, ZIP/Office, JPEG...) now look like unstructured high-entropy data within 15 s (rule threshold: 6). This catches content replacement in files that were already compressed, where an entropy jump cannot be seen.
+  Could be legitimate if it is: a tool that rewrote files in a proprietary or encrypted-on-purpose format, or a broken export.
+  What to do: Open one of the listed files: if it no longer opens in its normal program, stop writing to this folder and check the latest backup with 'bastion backup validate'.
+  Related events (showing 3 of 6):
+    2026-10-24 21:17:02  modified  scan_00.pdf  [sha256=7e10341fb47e…, entropy=7.95 (was 7.91)]
+    2026-10-24 21:17:02  modified  scan_01.pdf  [sha256=db5a26f7f0ab…, entropy=7.96 (was 7.90)]
+    2026-10-24 21:17:02  modified  scan_02.pdf  [sha256=df24ba00ca49…, entropy=7.95 (was 7.92)]
+  ⚠ This is a signal for analysis: it may have a legitimate cause and, on its own, does not prove malicious activity.
+
+
+[HIGH] Several independent signals coincided  (rule: correlated_signals)
+  What was observed: 3 different rules fired within 60 s: entropy_spike, header_lost, mass_modification. Independent signals coinciding raises the priority of the analysis, but does not prove the cause.
+  Could be legitimate if it is: large legitimate operations (migration, restore, update) can trigger several rules at once.
+  What to do: Treat this as an analysis priority: review the individual alerts and their related events.
+  ⚠ This is a signal for analysis: it may have a legitimate cause and, on its own, does not prove malicious activity.
+
+
+[HIGH] The same file appeared in many different folders  (rule: note_dropped)
+  What was observed: An identical small file ('SIMULATION-NOTICE.txt') was created in 5 distinct folders within 30 s (rule threshold: 5).
+  Could be legitimate if it is: project scaffolding, unpacking an archive that ships a README/LICENSE in every folder, or a sync client.
+  What to do: Read one of the files. If you did not create them and they contain instructions or messages, do not follow them; keep the files as evidence and review the other alerts.
+  Related events (showing 3 of 5):
+    2026-10-24 21:17:02  created   dept_00/SIMULATION-NOTICE.txt  [sha256=26905ad65ab9…, entropy=4.16]
+    2026-10-24 21:17:02  created   dept_01/SIMULATION-NOTICE.txt  [sha256=26905ad65ab9…, entropy=4.16]
+    2026-10-24 21:17:02  created   dept_02/SIMULATION-NOTICE.txt  [sha256=26905ad65ab9…, entropy=4.16]
+  ⚠ This is a signal for analysis: it may have a legitimate cause and, on its own, does not prove malicious activity.
+
+
+[MEDIUM] Many files now share the same new extension  (rule: uniform_extension)
+  What was observed: 6 distinct files were renamed to the same new extension '.simulated' within 15 s (rule threshold: 6).
+  Could be legitimate if it is: a bulk format conversion or an archive/export tool that tags its output.
+  What to do: Check whether the extension belongs to a program you use. An unknown extension appended to many files deserves a closer look.
+  Related events (showing 3 of 6):
+    2026-10-24 21:17:02  moved     doc_030.txt -> doc_030.txt.simulated  [sha256=b80f03b800b9…, entropy=4.04 (was 4.04)]
+    2026-10-24 21:17:02  moved     doc_031.txt -> doc_031.txt.simulated  [sha256=a4e8c4669f0f…, entropy=3.99 (was 3.99)]
+    2026-10-24 21:17:02  moved     doc_032.txt -> doc_032.txt.simulated  [sha256=6a9a33a85621…, entropy=4.03 (was 4.03)]
+  ⚠ This is a signal for analysis: it may have a legitimate cause and, on its own, does not prove malicious activity.
+
+
+[MEDIUM] Many file extensions changed  (rule: extension_change)
+  What was observed: 8 distinct files had their extension changed within 15 s (rule threshold: 8).
+  Could be legitimate if it is: bulk format conversion or organizing tools.
+  What to do: Look at which new extensions appeared and whether the same one repeats across many files.
+  Related events (showing 3 of 8):
+    2026-10-24 21:17:02  moved     doc_030.txt -> doc_030.txt.simulated  [sha256=b80f03b800b9…, entropy=4.04 (was 4.04)]
+    2026-10-24 21:17:02  moved     doc_031.txt -> doc_031.txt.simulated  [sha256=a4e8c4669f0f…, entropy=3.99 (was 3.99)]
+    2026-10-24 21:17:02  moved     doc_032.txt -> doc_032.txt.simulated  [sha256=6a9a33a85621…, entropy=4.03 (was 4.03)]
+  ⚠ This is a signal for analysis: it may have a legitimate cause and, on its own, does not prove malicious activity.
+
+
+[MEDIUM] Many files renamed in a short time  (rule: mass_rename)
+  What was observed: 10 distinct files were renamed/moved within 10 s (rule threshold: 10).
+  Could be legitimate if it is: folder reorganization, bulk-rename tools or a planned migration.
+  What to do: Check whether someone ran a planned reorganization. If not, validate the latest backup with 'bastion backup validate'.
+  Related events (showing 3 of 10):
+    2026-10-24 21:17:02  moved     doc_030.txt -> doc_030.txt.simulated  [sha256=b80f03b800b9…, entropy=4.04 (was 4.04)]
+    2026-10-24 21:17:02  moved     doc_031.txt -> doc_031.txt.simulated  [sha256=a4e8c4669f0f…, entropy=3.99 (was 3.99)]
+    2026-10-24 21:17:02  moved     doc_032.txt -> doc_032.txt.simulated  [sha256=6a9a33a85621…, entropy=4.03 (was 4.03)]
+  ⚠ This is a signal for analysis: it may have a legitimate cause and, on its own, does not prove malicious activity.
+
+
+[MEDIUM] Many files deleted in a short time  (rule: mass_deletion)
+  What was observed: 10 distinct files were deleted within 10 s (rule threshold: 10).
+  Could be legitimate if it is: cleanup of temporary folders, an uninstall or a planned archive job.
+  What to do: Check the recycle bin and the latest backup before doing anything else.
+  Related events (showing 3 of 10):
+    2026-10-24 21:17:02  deleted   doc_045.txt  [sha256=-]
+    2026-10-24 21:17:02  deleted   doc_046.txt  [sha256=-]
+    2026-10-24 21:17:02  deleted   doc_047.txt  [sha256=-]
+  ⚠ This is a signal for analysis: it may have a legitimate cause and, on its own, does not prove malicious activity.
+
+
+[HIGH] A canary file was touched  (rule: canary_touched)
+  What was observed: A canary file (one that nobody should open or change) was modified, renamed or deleted.
+  Could be legitimate if it is: someone opened and saved the canary file by accident, or a scan/indexer touched it.
+  What to do: Find out who or what touched it. If it is unknown, treat it as possible unauthorized activity and review the other events.
+  Related events (showing 1 of 1):
+    2026-10-24 21:17:02  modified  000-confidential-finance.txt  [sha256=08ebf661c3f7…, entropy=4.71 (was 4.66)]
+  ⚠ This is a signal for analysis: it may have a legitimate cause and, on its own, does not prove malicious activity.
+
+
+== Summary ==
+Alerts raised: 10; rules triggered: canary_touched, correlated_signals, entropy_spike, extension_change, header_lost, mass_deletion, mass_modification, mass_rename, note_dropped, uniform_extension
+Log chain: intact (88 records).
+Temporary simulation folder removed.

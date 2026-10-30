@@ -1,0 +1,69 @@
+{
+  "cooldown_seconds": 30,
+  "ignore_patterns": [
+    "*.swp",
+    "*.tmp",
+    "*~",
+    ".DS_Store",
+    "Thumbs.db",
+    "~$*",
+    "*.log"
+  ],
+  "rules": {
+    "mass_modification": {
+      "enabled": true,
+      "threshold": 10,
+      "window_seconds": 10
+    },
+    "mass_rename": {
+      "enabled": true,
+      "threshold": 5,
+      "window_seconds": 10
+    },
+    "mass_deletion": {
+      "enabled": true,
+      "threshold": 5,
+      "window_seconds": 10
+    },
+    "extension_change": {
+      "enabled": true,
+      "threshold": 5,
+      "window_seconds": 15
+    },
+    "entropy_spike": {
+      "enabled": true,
+      "threshold": 5,
+      "window_seconds": 15,
+      "min_entropy": 7.5,
+      "min_delta": 2.5,
+      "min_size_bytes": 1024
+    },
+    "header_lost": {
+      "enabled": true,
+      "threshold": 6,
+      "window_seconds": 15,
+      "min_entropy": 7.0,
+      "min_size_bytes": 512
+    },
+    "uniform_extension": {
+      "enabled": true,
+      "threshold": 6,
+      "window_seconds": 15
+    },
+    "note_dropped": {
+      "enabled": true,
+      "threshold": 5,
+      "window_seconds": 30,
+      "min_size_bytes": 40,
+      "max_size_bytes": 65536
+    },
+    "canary_touched": {
+      "enabled": true
+    },
+    "correlated_signals": {
+      "enabled": true,
+      "threshold": 3,
+      "window_seconds": 60
+    }
+  }
+}

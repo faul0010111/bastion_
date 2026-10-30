@@ -1,0 +1,83 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bastion"
+version = "0.2.0"
+description = "Defensive ransomware-signal detection and file integrity protection for small businesses (educational project)."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Bastion contributors" }]
+keywords = ["security", "ransomware", "file-integrity", "backup", "defensive", "blue-team"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Topic :: Security",
+    "Intended Audience :: Education",
+]
+dependencies = [
+    "cryptography>=42.0",
+    "watchdog>=4.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-cov>=5.0",
+    "hypothesis>=6.100",
+    "ruff>=0.5",
+    "mypy>=1.10",
+]
+
+[project.scripts]
+bastion = "bastion.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+markers = ["integration: uses the real file observer (watchdog)"]
+addopts = "-ra"
+
+[tool.coverage.run]
+source = ["bastion"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+exclude_lines = ["pragma: no cover", "if __name__ == .__main__.:", "raise NotImplementedError"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "C4", "RUF", "S"]
+ignore = [
+    "E501",           # long user-facing message strings are kept on one line for greppability
+    "E702", "E701",   # a few deliberate one-line compound statements in the CLI parser
+    "C408",           # dict(...) is used for readability in places
+    "S101",           # assert is the point of tests; src uses it only for type narrowing
+    "UP037", "UP006", "UP007", "UP035", "UP045",   # keep typing style compatible and consistent
+    "RUF012",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S", "B", "RUF"]
+
+[tool.mypy]
+python_version = "3.10"
+files = ["src/bastion"]
+strict = true
+warn_unused_ignores = true
+disallow_any_generics = false
+
+[[tool.mypy.overrides]]
+module = ["watchdog.*"]
+ignore_missing_imports = true
