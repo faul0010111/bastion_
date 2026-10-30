@@ -1,4 +1,4 @@
-# 🛡️ Bastion
+# Bastion
 
 **Defensive ransomware-signal detection and file integrity protection for small businesses.**
 An open source, educational portfolio project written in Python.
