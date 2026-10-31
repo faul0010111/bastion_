@@ -108,6 +108,10 @@ class EventProcessor:
         if note == NOT_REGULAR_NOTE:
             return None
         prev = self.index.get(rel)
+        if kind == "created" and prev is not None:
+            # Some observers (e.g. macOS FSEvents) keep reporting "created" for a path that
+            # was created shortly before; a path already in the index is a modification.
+            kind = "modified"
         if kind == "modified" and fp and prev and prev.sha256 == fp.sha256:
             return None  # no content change (duplicate event or metadata only)
         ev = Event(kind, rel, self.clock(), sha256=fp.sha256 if fp else None,
