@@ -128,8 +128,10 @@ def create_backup(
             "files": sorted(entries, key=lambda f: f["path"]),
         }
         text = json.dumps(manifest, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
-        (tmp / MANIFEST_NAME).write_text(text, encoding="utf-8")
-        digest = hashlib.sha256(text.encode("utf-8")).hexdigest()
+        payload = text.encode("utf-8")
+        # write_bytes: text mode would turn "\n" into "\r\n" on Windows and break the digest.
+        (tmp / MANIFEST_NAME).write_bytes(payload)
+        digest = hashlib.sha256(payload).hexdigest()
         os.replace(tmp, final)
     except BaseException:
         shutil.rmtree(tmp, ignore_errors=True)
